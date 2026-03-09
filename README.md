@@ -8,7 +8,7 @@ Smart crowd management platform for Gujarat temples:
 
 Built for fast hackathon/final-year implementation with two core problem tracks:
 1. Smart Queue + Digital Darshan Pass
-2. AI/Rule-based Crowd Prediction
+2. AI/ML Crowd Prediction
 
 ## Tech Stack
 - Backend: Node.js, Express, MongoDB, Mongoose, JWT
@@ -29,7 +29,7 @@ Built for fast hackathon/final-year implementation with two core problem tracks:
 
 ### 2) Crowd Prediction Engine
 - Endpoint: `GET /api/prediction/:templeId?date=YYYY-MM-DD`
-- ML-based crowd score prediction (RandomForest) with rule fallback
+- ML-based crowd score prediction (RandomForest) with rule fallback if ML service is unavailable
 - Festival-aware feature engineering with temple-specific boosts
 - 24-hour hourly crowd breakdown
 - Hour labels: `Low`, `Moderate`, `High`, `Critical`
@@ -79,6 +79,16 @@ ml-service/
 ### Prerequisites
 - Node.js 20+ (recommended)
 - MongoDB connection string (Atlas/local)
+- Python 3.10+ (for ML service)
+
+### Environment Variables (`.env`)
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_strong_secret
+JWT_EXPIRES_IN=7d
+ML_SERVICE_URL=http://127.0.0.1:8000
+```
 
 ### Backend
 ```bash
@@ -122,7 +132,7 @@ npm run dev
 ## Demo Flow (3-5 min viva)
 1. Register/Login (header modal)
 2. Home -> temple detail
-3. Book pass -> show QR + queue token + assigned position
+3. Book pass -> instantly show QR + queue token + assigned position
 4. Open My Bookings -> retrieve QR anytime
 5. Open Predictions page -> select temple/date and show forecast
    - prediction source will show `ML Model` or `Rule Fallback`
@@ -130,6 +140,25 @@ npm run dev
    - live occupancy bars
    - call next / mark completed
 7. Prediction API with festival date to show crowd spike
+
+## Quick Run (All Services)
+### Terminal 1 (Backend)
+```bash
+npm start
+```
+
+### Terminal 2 (ML Service)
+```bash
+cd ml-service
+.venv\Scripts\activate
+uvicorn server:app --host 127.0.0.1 --port 8000
+```
+
+### Terminal 3 (Frontend)
+```bash
+cd frontend
+npm run dev
+```
 
 ## Important APIs
 - `POST /api/auth/register`
@@ -144,3 +173,7 @@ npm run dev
 - `POST /api/queue/call-next`
 - `POST /api/queue/mark-completed`
 - `GET /api/prediction/:templeId?date=YYYY-MM-DD`
+
+## Notes
+- Frontend is intentionally booking-first to reduce user confusion: no separate queue page in primary flow.
+- Queue APIs are still available for admin workflows and integrations.
