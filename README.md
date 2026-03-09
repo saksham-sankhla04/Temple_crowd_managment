@@ -13,6 +13,7 @@ Built for fast hackathon/final-year implementation with two core problem tracks:
 ## Tech Stack
 - Backend: Node.js, Express, MongoDB, Mongoose, JWT
 - Frontend: React, React Router, Tailwind CSS, Recharts
+- ML Service: Python, FastAPI, scikit-learn (RandomForestRegressor)
 - Security/Auth: JWT-based role access (`admin`, `staff`, `pilgrim`)
 
 ## Implemented Features
@@ -28,7 +29,8 @@ Built for fast hackathon/final-year implementation with two core problem tracks:
 
 ### 2) Crowd Prediction Engine
 - Endpoint: `GET /api/prediction/:templeId?date=YYYY-MM-DD`
-- Festival-aware score computation (0-100) with temple-specific boosts
+- ML-based crowd score prediction (RandomForest) with rule fallback
+- Festival-aware feature engineering with temple-specific boosts
 - 24-hour hourly crowd breakdown
 - Hour labels: `Low`, `Moderate`, `High`, `Critical`
 - Returns `peakHour`, `festivalName`, and operational recommendation
@@ -44,7 +46,12 @@ React Frontend
 
 Express Backend
   -> Controllers + Routes + Middleware
+  -> ML inference call (if ML service is running)
   -> MongoDB (Temple, User, Pass, Queue collections)
+
+Python ML Service
+  -> /predict (crowd score inference)
+  -> /health
 ```
 
 ## Project Structure
@@ -62,6 +69,10 @@ frontend/
   src/
     pages/
     lib/api.ts
+ml-service/
+  server.py
+  train_model.py
+  requirements.txt
 ```
 
 ## Setup
@@ -76,6 +87,16 @@ copy .env.example .env
 npm start
 ```
 
+### ML Service (Optional but Recommended)
+```bash
+cd ml-service
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python train_model.py
+uvicorn server:app --host 127.0.0.1 --port 8000
+```
+
 ### Frontend
 ```bash
 cd frontend
@@ -86,6 +107,7 @@ npm run dev
 ## Default URLs
 - Backend: `http://localhost:5000`
 - Frontend: `http://localhost:5173`
+- ML Service: `http://127.0.0.1:8000`
 
 ## Authentication Flow (Updated)
 - User logs in/registers from header modal in frontend.
@@ -103,6 +125,7 @@ npm run dev
 3. Book pass -> show QR + queue token + assigned position
 4. Open My Bookings -> retrieve QR anytime
 5. Open Predictions page -> select temple/date and show forecast
+   - prediction source will show `ML Model` or `Rule Fallback`
 6. Admin dashboard:
    - live occupancy bars
    - call next / mark completed

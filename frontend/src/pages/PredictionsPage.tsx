@@ -26,6 +26,9 @@ type PredictionResponse = {
   peakHour: string;
   recommendation: string;
   hourlyBreakdown: HourlyItem[];
+  model: string;
+  predictionSource: "ml" | "rule-fallback";
+  baselineRuleScore: number;
 };
 
 const todayString = new Date().toISOString().slice(0, 10);
@@ -141,6 +144,14 @@ function PredictionsPage() {
             </div>
           </div>
 
+          <div className="rounded-xl border border-saffron-200 bg-white p-4 shadow-temple">
+            <p className="text-xs uppercase text-slate-500">Prediction Engine</p>
+            <p className="text-sm font-semibold text-saffron-800">
+              {prediction.predictionSource === "ml" ? "ML Model" : "Rule Fallback"} ({prediction.model})
+            </p>
+            <p className="mt-1 text-xs text-slate-600">Baseline rule score: {prediction.baselineRuleScore}</p>
+          </div>
+
           <div className="rounded-2xl border border-saffron-200 bg-white p-5 shadow-temple">
             <p className="mb-3 text-sm font-semibold text-saffron-700">Recommendation</p>
             <p className="rounded-lg bg-saffron-50 p-3 text-sm text-slate-800">{prediction.recommendation}</p>
@@ -211,4 +222,3 @@ function PredictionsPage() {
 }
 
 export default PredictionsPage;
-
